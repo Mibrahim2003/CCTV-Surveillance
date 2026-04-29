@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeWatch | CCTV Monitoring Dashboard</title>
+    <meta name="description" content="SafeWatch AI-Powered CCTV Anomaly Detection Dashboard">
+    <style>
+        /* ============================================
+           DESIGN SYSTEM
+           ============================================ */
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2332;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-default: #1e293b;
+            --border-normal: #334155;
+
+            /* Status colors */
+            --color-alert: #ef4444;
+            --color-alert-glow: rgba(239, 68, 68, 0.45);
+            --color-warning: #eab308;
+            --color-warning-glow: rgba(234, 179, 8, 0.35);
+            --color-normal: #22c55e;
+
+            /* Accent */
+            --accent-blue: #3b82f6;
+            --accent-blue-dim: rgba(59, 130, 246, 0.15);
+        }
+
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border-default);
+            background: linear-gradient(180deg, rgba(17, 24, 39, 0.8) 0%, transparent 100%);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent-blue), #6366f1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--accent-blue);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border-default);
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-alert);
+            transition: background 0.3s;
+        }
+
+        .connection-status.connected .connection-dot {
+            background: var(--color-normal);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ============================================
+           STATS BAR
+           ============================================ */
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .stat-value.alert-count { color: var(--color-alert); }
+        .stat-value.warning-count { color: var(--color-warning); }
+
+        /* ============================================
+           CAMERA GRID
+           ============================================ */
+        .grid-container {
+            padding: 28px 32px;
+        }
+
+        .camera-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        /* ============================================
+           CAMERA TILE
+           ============================================ */
+        .camera-tile {
+            background: var(--bg-card);
+            border: 2px solid var(--border-normal);
+            border-radius: 14px;
+            padding: 0;
+            overflow: hidden;
+            transition: border-color 0.4s, box-shadow 0.4s, transform 0.2s;
+        }
+
+        .camera-tile:hover {
+            transform: translateY(-2px);
+            background: var(--bg-card-hover);
+        }
+
+        /* Status-specific tile styles */
+        .camera-tile.status-ALERT {
+            border-color: var(--color-alert);
+            box-shadow: 0 0 20px var(--color-alert-glow), 0 0 60px rgba(239, 68, 68, 0.1);
+            animation: glow-red 1.5s ease-in-out infinite alternate;
+        }
+
+        .camera-tile.status-WARNING {
+            border-color: var(--color-warning);
+            box-shadow: 0 0 16px var(--color-warning-glow), 0 0 40px rgba(234, 179, 8, 0.08);
+            animation: glow-yellow 2s ease-in-out infinite alternate;
+        }
+
+        .camera-tile.status-NORMAL {
+            border-color: var(--border-normal);
+            box-shadow: none;
+        }
+
+        @keyframes glow-red {
+            0% { box-shadow: 0 0 20px var(--color-alert-glow), 0 0 60px rgba(239, 68, 68, 0.1); }
+            100% { box-shadow: 0 0 30px var(--color-alert-glow), 0 0 80px rgba(239, 68, 68, 0.2); }
+        }
+
+        @keyframes glow-yellow {
+            0% { box-shadow: 0 0 16px var(--color-warning-glow), 0 0 40px rgba(234, 179, 8, 0.08); }
+            100% { box-shadow: 0 0 24px var(--color-warning-glow), 0 0 50px rgba(234, 179, 8, 0.14); }
+        }
+
+        /* Tile Header */
+        .tile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 12px;
+        }
+
+        .camera-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .live-badge {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--color-normal);
+            text-transform: uppercase;
+        }
+
+        /* Tile Video Area */
+        .tile-video {
+            width: 100%;
+            height: 180px;
+            background: #0d1117;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .tile-video::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255,255,255,0.015) 2px,
+                rgba(255,255,255,0.015) 4px
+            );
+            pointer-events: none;
+        }
+
+        .video-placeholder {
+            color: var(--text-muted);
+            font-size: 13px;
+            z-index: 1;
+        }
+
+        /* Tile Footer */
+        .tile-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border-default);
+        }
+
+        .score-display {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s;
+        }
+
+        .score-value.ALERT { color: var(--color-alert); }
+        .score-value.WARNING { color: var(--color-warning); }
+        .score-value.NORMAL { color: var(--color-normal); }
+
+        /* Status Badge */
+        .status-badge {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .status-badge.ALERT {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--color-alert);
+        }
+
+        .status-badge.WARNING {
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--color-warning);
+        }
+
+        .status-badge.NORMAL {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--color-normal);
+        }
+
+        /* ============================================
+           ALERT LOG
+           ============================================ */
+        .log-section {
+            padding: 0 32px 32px;
+        }
+
+        .log-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .alert-log {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 12px;
+        }
+
+        .alert-log::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .alert-log::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .alert-log::-webkit-scrollbar-thumb {
+            background: var(--border-normal);
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slide-in 0.3s ease-out;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .log-camera {
+            color: var(--accent-blue);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .log-status {
+            font-weight: 700;
+        }
+
+        .log-status.ALERT { color: var(--color-alert); }
+        .log-status.WARNING { color: var(--color-warning); }
+
+        .log-score {
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        .log-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-icon">S</div>
+            <div class="logo-text">Safe<span>Watch</span></div>
+        </div>
+        <div id="connectionStatus" class="connection-status">
+            <div class="connection-dot"></div>
+            <span id="connectionText">Disconnected</span>
+        </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            Cameras Online:
+            <span class="stat-value" id="camerasOnline">4</span>
+        </div>
+        <div class="stat-item">
+            Active Alerts:
+            <span class="stat-value alert-count" id="activeAlerts">0</span>
+        </div>
+        <div class="stat-item">
+            Warnings:
+            <span class="stat-value warning-count" id="activeWarnings">0</span>
+        </div>
+    </div>
+
+    <!-- Camera Grid -->
+    <div class="grid-container">
+        <div class="camera-grid" id="cameraGrid">
+            <!-- Tiles generated by JS -->
+        </div>
+    </div>
+
+    <!-- Alert Log -->
+    <div class="log-section">
+        <div class="log-title">Event Log</div>
+        <div class="alert-log" id="alertLog">
+            <div class="log-empty">Waiting for events...</div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // CONFIGURATION
+        // =============================================
+        const WS_URL = `ws://${window.location.hostname}:8765`;
+        let CAMERAS = [];  // Populated from /api/cameras
+        const MAX_LOG_ENTRIES = 50;
+
+        // =============================================
+        // STATE
+        // =============================================
+        const cameraStates = {};
+        let ws = null;
+        let reconnectTimer = null;
+        let activeCameraCount = 0;
+
+        // =============================================
+        // INIT TILES
+        // =============================================
+        function initTiles(cameraConfig) {
+            const grid = document.getElementById("cameraGrid");
+            grid.innerHTML = "";
+            activeCameraCount = 0;
+
+            cameraConfig.forEach(cam => {
+                const name = cam.id;
+                const index = cam.index;
+                const active = cam.active;
+                CAMERAS.push(name);
+                cameraStates[name] = { score: 0, status: active ? "NORMAL" : "OFFLINE" };
+                if (active) activeCameraCount++;
+
+                const tile = document.createElement("div");
+                tile.className = active ? "camera-tile status-NORMAL" : "camera-tile status-OFFLINE";
+                tile.id = "tile-" + name.replace(/\s/g, "-");
+                tile.innerHTML = `
+                    <div class="tile-header">
+                        <span class="camera-name">${name}</span>
+                        <span class="live-badge">${active ? 'Live' : 'Offline'}</span>
+                    </div>
+                    <div class="tile-video">
+                        ${active
+                            ? `<img class="video-feed" src="/feed/${index}" alt="${name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                               <span class="video-placeholder" style="display:none">${name} — No Signal</span>`
+                            : `<span class="video-placeholder">${name} — Offline</span>`
+                        }
+                    </div>
+                    <div class="tile-footer">
+                        <div class="score-display">
+                            <span class="score-label">Score&nbsp;</span>
+                            <span class="score-value ${active ? 'NORMAL' : 'OFFLINE'}" id="score-${name.replace(/\s/g, "-")}">${active ? '0.00' : '—'}</span>
+                        </div>
+                        <span class="status-badge ${active ? 'NORMAL' : 'OFFLINE'}" id="badge-${name.replace(/\s/g, "-")}">${active ? 'NORMAL' : 'OFFLINE'}</span>
+                    </div>
+                `;
+                if (!active) tile.style.opacity = '0.5';
+                grid.appendChild(tile);
+            });
+
+            document.getElementById("camerasOnline").textContent = activeCameraCount;
+        }
+
+        // =============================================
+        // UPDATE TILE
+        // =============================================
+        function updateTile(camera, score, status) {
+            const id = camera.replace(/\s/g, "-");
+            const tile = document.getElementById("tile-" + id);
+            const scoreEl = document.getElementById("score-" + id);
+            const badgeEl = document.getElementById("badge-" + id);
+
+            if (!tile) return;
+
+            // Update tile border/glow
+            tile.className = "camera-tile status-" + status;
+
+            // Update score
+            scoreEl.textContent = score.toFixed(2);
+            scoreEl.className = "score-value " + status;
+
+            // Update badge
+            badgeEl.textContent = status;
+            badgeEl.className = "status-badge " + status;
+
+            // Update state
+            cameraStates[camera] = { score, status };
+            updateStats();
+        }
+
+        // =============================================
+        // UPDATE STATS BAR
+        // =============================================
+        function updateStats() {
+            let alerts = 0;
+            let warnings = 0;
+            Object.values(cameraStates).forEach(s => {
+                if (s.status === "ALERT") alerts++;
+                if (s.status === "WARNING") warnings++;
+            });
+            document.getElementById("activeAlerts").textContent = alerts;
+            document.getElementById("activeWarnings").textContent = warnings;
+        }
+
+        // =============================================
+        // ALERT LOG
+        // =============================================
+        function addLogEntry(camera, score, status) {
+            // Only log warnings and alerts
+            if (status === "NORMAL") return;
+
+            const log = document.getElementById("alertLog");
+            // Remove empty placeholder
+            const empty = log.querySelector(".log-empty");
+            if (empty) empty.remove();
+
+            const now = new Date();
+            const time = now.toTimeString().split(" ")[0];
+
+            const entry = document.createElement("div");
+            entry.className = "log-entry";
+            entry.innerHTML = `
+                <span class="log-time">${time}</span>
+                <span class="log-camera">${camera}</span>
+                <span class="log-status ${status}">${status}</span>
+                <span class="log-score">Score: ${score.toFixed(2)}</span>
+            `;
+
+            // Insert at top
+            log.insertBefore(entry, log.firstChild);
+
+            // Cap log entries
+            while (log.children.length > MAX_LOG_ENTRIES) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        // =============================================
+        // WEBSOCKET
+        // =============================================
+        function connect() {
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
+
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                const el = document.getElementById("connectionStatus");
+                el.classList.add("connected");
+                document.getElementById("connectionText").textContent = "Connected";
+                console.log("[SafeWatch] WebSocket connected");
+            };
+
+            ws.onclose = () => {
+                const el = document.getElementById("connectionStatus");
+                el.classList.remove("connected");
+                document.getElementById("connectionText").textContent = "Disconnected";
+                console.log("[SafeWatch] WebSocket disconnected. Reconnecting in 3s...");
+                reconnectTimer = setTimeout(connect, 3000);
+            };
+
+            ws.onerror = (err) => {
+                console.error("[SafeWatch] WebSocket error:", err);
+                ws.close();
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    const { camera, score, status } = data;
+                    if (camera && score !== undefined && status) {
+                        updateTile(camera, score, status);
+                        addLogEntry(camera, score, status);
+                    }
+                } catch (e) {
+                    console.error("[SafeWatch] Failed to parse message:", e);
+                }
+            };
+        }
+
+        // =============================================
+        // BOOT
+        // =============================================
+        fetch('/api/cameras')
+            .then(r => r.json())
+            .then(config => {
+                initTiles(config);
+                connect();
+            })
+            .catch(() => {
+                // Fallback if API unavailable
+                initTiles([
+                    {id: 'Camera 1', index: 0, active: true},
+                    {id: 'Camera 2', index: 1, active: false},
+                    {id: 'Camera 3', index: 2, active: false},
+                    {id: 'Camera 4', index: 3, active: false},
+                ]);
+                connect();
+            });
+    </script>
+
+</body>
+</html>

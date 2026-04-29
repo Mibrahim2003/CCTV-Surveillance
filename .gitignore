@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test videos (large files — don't commit)
+*.avi
+*.mp4
+*.mkv
+*.mov
+
+# Model files (large — track with Git LFS or download separately)
+# Uncomment the next two lines if NOT using Git LFS:
+# models/*.pt
+# models/*.pkl
