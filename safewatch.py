@@ -122,7 +122,7 @@ async def main():
     # 1. Create frame buffers for active cameras
     frame_buffers = {}
     for i, cam in enumerate(CAMERAS):
-        if cam["source"]:
+        if cam["source"] is not None:
             frame_buffers[i] = FrameBuffer()
 
     # 2. Start HTTP + MJPEG server
@@ -154,7 +154,7 @@ async def main():
     # 5. Start camera pipelines
     pipelines = []
     for i, cam in enumerate(CAMERAS):
-        if cam["source"]:
+        if cam["source"] is not None:
             pipeline = CameraPipeline(
                 camera_id=cam["id"],
                 source=cam["source"],
