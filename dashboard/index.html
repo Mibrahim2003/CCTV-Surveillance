@@ -462,7 +462,7 @@
         // =============================================
         // CONFIGURATION
         // =============================================
-        const WS_URL = `ws://${window.location.hostname}:8765`;
+        let WS_URL = `ws://${window.location.hostname}:8765`;  // Default, overridden by API
         let CAMERAS = [];  // Populated from /api/cameras
         const MAX_LOG_ENTRIES = 50;
 
@@ -644,8 +644,11 @@
         // =============================================
         fetch('/api/cameras')
             .then(r => r.json())
-            .then(config => {
-                initTiles(config);
+            .then(payload => {
+                if (payload.ws_port) {
+                    WS_URL = `ws://${window.location.hostname}:${payload.ws_port}`;
+                }
+                initTiles(payload.cameras || payload);
                 connect();
             })
             .catch(() => {

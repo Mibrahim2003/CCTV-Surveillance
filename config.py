@@ -39,14 +39,14 @@ WARNING_THRESHOLD = 0.5 # Score >= 0.5 and < 0.7 → YELLOW warning (suspicious)
 # --- Score Fusion Weights ---
 # LSTM (primary) + Autoencoder (secondary) weighted combination.
 # These are untuned initial values — revisit after autoencoder is built.
-LSTM_WEIGHT = 0.7       # Primary model weight
-AUTOENCODER_WEIGHT = 0.3  # Secondary model weight (not active yet)
+LSTM_WEIGHT = 0.7       # Primary model weight        # TODO: NOT YET WIRED — reserved for score fusion
+AUTOENCODER_WEIGHT = 0.3  # Secondary model weight    # TODO: NOT YET WIRED — reserved for score fusion
 
 # --- Motion Gate ---
 # Minimum pixel-difference threshold to consider a frame as "has motion".
 # Frames below this are skipped entirely before any AI processing.
 MOTION_THRESHOLD = 2   # Pixel intensity difference threshold
-MOTION_MIN_AREA = 500   # Minimum contiguous changed pixels to count as motion
+MOTION_MIN_AREA = 500   # Minimum contiguous changed pixels  # TODO: NOT YET WIRED — reserved for contour-based gate
 
 # --- Server ---
 HTTP_PORT = 8080        # Dashboard + MJPEG feeds served on this port

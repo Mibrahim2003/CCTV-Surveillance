@@ -31,10 +31,7 @@ except ImportError:
     print("    pip install websockets")
     raise
 
-from config import ALERT_THRESHOLD, WARNING_THRESHOLD
-
-# Default port for the WebSocket server
-WS_PORT = 8765
+from config import ALERT_THRESHOLD, WARNING_THRESHOLD, WS_PORT
 
 
 class AlertServer:

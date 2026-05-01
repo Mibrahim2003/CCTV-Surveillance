@@ -51,7 +51,11 @@ class SafeWatchHandler(SimpleHTTPRequestHandler):
 
     def _serve_camera_config(self):
         import json
-        data = json.dumps(self.camera_config).encode()
+        payload = {
+            "cameras": self.camera_config,
+            "ws_port": self.ws_port,
+        }
+        data = json.dumps(payload).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(data)))
@@ -138,7 +142,8 @@ async def main():
     print(f"[SafeWatch] Dashboard:  http://127.0.0.1:{HTTP_PORT}")
 
     # 3. Start WebSocket alert server
-    alert_server = AlertServer()
+    SafeWatchHandler.ws_port = WS_PORT
+    alert_server = AlertServer(port=WS_PORT)
     await alert_server.start()
     print(f"[SafeWatch] Alerts:    ws://127.0.0.1:{WS_PORT}")
 
