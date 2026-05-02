@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -579,15 +579,15 @@
         <div class="modal" id="manageModal">
             <div class="modal-header">
                 <span class="modal-title" id="modalTitle">Manage Camera</span>
-                <button class="modal-close" onclick="closeModal()">âœ•</button>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
 
             <!-- Connect section -->
             <div id="connectSection">
                 <div class="modal-label">Connect Source</div>
                 <div class="source-type-tabs">
-                    <button class="tab-btn active" id="tabCctv" onclick="switchTab('cctv')">ðŸ“¡ CCTV</button>
-                    <button class="tab-btn" id="tabVideo" onclick="switchTab('video')">ðŸŽ¬ Video</button>
+                    <button class="tab-btn active" id="tabCctv" onclick="switchTab('cctv')">&#x25A6; CCTV</button>
+                    <button class="tab-btn" id="tabVideo" onclick="switchTab('video')">&#x25B6; Video</button>
                 </div>
 
                 <!-- CCTV panel -->
@@ -605,7 +605,7 @@
                 <div class="source-panel" id="panelVideo">
                     <div class="modal-label">Local File Path</div>
                     <input class="modal-input" id="videoPath" type="text" placeholder="C:\Videos\clip.avi or relative path">
-                    <div class="modal-label" style="margin-top:12px">â€” or upload â€”</div>
+                    <div class="modal-label" style="margin-top:12px">-- or upload --</div>
                     <input type="file" id="videoFile" accept=".avi,.mp4,.mkv,.mov,.webm" style="display:none" onchange="handleFileSelected()">
                     <div class="modal-btn-row">
                         <button class="btn btn-ghost" onclick="document.getElementById('videoFile').click()">Browse...</button>
@@ -620,10 +620,10 @@
             <!-- Actions -->
             <div id="actionSection">
                 <div class="modal-btn-row" id="disconnectRow" style="display:none">
-                    <button class="btn btn-warning" onclick="disconnectCamera()">â¹ Disconnect</button>
+                    <button class="btn btn-warning" onclick="disconnectCamera()">&#9209; Disconnect</button>
                 </div>
                 <div class="modal-btn-row" style="margin-top:8px">
-                    <button class="btn btn-danger" onclick="removeCamera()">ðŸ—‘ Remove Camera</button>
+                    <button class="btn btn-danger" onclick="removeCamera()">Remove Camera</button>
                 </div>
             </div>
         </div>
@@ -694,14 +694,14 @@
                     ${cam.active
                         ? `<img class="video-feed" id="feed-${cam.index}" src="/feed/${cam.index}" alt="${cam.id}"
                                onerror="this.style.display='none';document.getElementById('placeholder-${cam.index}').style.display='flex'" />
-                           <span class="video-placeholder" id="placeholder-${cam.index}" style="display:none">${cam.id} â€” No Signal</span>`
-                        : `<span class="video-placeholder" id="placeholder-${cam.index}">${cam.id} â€” Offline</span>`
+                           <span class="video-placeholder" id="placeholder-${cam.index}" style="display:none">${cam.id} -- No Signal</span>`
+                        : `<span class="video-placeholder" id="placeholder-${cam.index}">${cam.id} -- Offline</span>`
                     }
                 </div>
                 <div class="tile-footer">
                     <div class="score-display">
                         <span class="score-label">Score&nbsp;</span>
-                        <span class="score-value ${status}" id="score-${cam.index}">${cam.active ? '0.00' : 'â€”'}</span>
+                        <span class="score-value ${status}" id="score-${cam.index}">${cam.active ? '0.00' : '--'}</span>
                     </div>
                     <span class="status-badge ${status}" id="badge-${cam.index}">${status}</span>
                 </div>
@@ -720,7 +720,7 @@
             addTile.className = "camera-tile add-tile";
             addTile.id = "add-tile";
             addTile.onclick = createCamera;
-            addTile.innerHTML = `<div class="add-tile-icon">ï¼‹</div><div class="add-tile-label">Add Camera</div>`;
+            addTile.innerHTML = `<div class="add-tile-icon">+</div><div class="add-tile-label">Add Camera</div>`;
             grid.appendChild(addTile);
         }
 
@@ -734,7 +734,7 @@
             if (!tile) return;
 
             tile.className = "camera-tile status-" + status;
-            if (scoreEl) { scoreEl.textContent = (score !== null) ? score.toFixed(2) : "â€”"; scoreEl.className = "score-value " + status; }
+            if (scoreEl) { scoreEl.textContent = (score !== null) ? score.toFixed(2) : "--"; scoreEl.className = "score-value " + status; }
             if (badgeEl) { badgeEl.textContent = status; badgeEl.className = "status-badge " + status; }
 
             if (cameraStates[index]) cameraStates[index].status = status;
@@ -763,7 +763,7 @@
         }
 
         // =============================================
-        // WEBSOCKET â€” uses camera_index for tile matching
+        // WEBSOCKET -- uses camera_index for tile matching
         // =============================================
         function connect() {
             if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
