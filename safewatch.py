@@ -121,11 +121,19 @@ class CameraManager:
     def add_camera(self, camera_id):
         """Create a new offline camera tile. Returns camera info."""
         with self._lock:
+            # Enforce unique names — append (2), (3)... if name already exists
+            existing_names = {c["id"] for c in self._cameras.values()}
+            unique_id = camera_id
+            suffix = 2
+            while unique_id in existing_names:
+                unique_id = f"{camera_id} ({suffix})"
+                suffix += 1
+
             index = self._next_index
             self._next_index += 1
             self._cameras[index] = {
                 "index": index,
-                "id": camera_id,
+                "id": unique_id,
                 "source": None,
                 "source_type": "none",
                 "pipeline": None,
@@ -366,20 +374,32 @@ class SafeWatchHandler(SimpleHTTPRequestHandler):
         if source_type not in ("cctv", "video_path", "video_upload"):
             return self._send_json(400, {"error": f"Invalid source_type: {source_type}"})
         result = self.camera_manager.connect_camera(index, source, source_type)
-        status = 200 if "camera" in result else 400
-        self._send_json(status, result)
+        if "camera" in result:
+            self._send_json(200, result)
+        elif "not found" in result.get("error", ""):
+            self._send_json(404, result)
+        elif "already connected" in result.get("error", ""):
+            self._send_json(409, result)
+        else:
+            self._send_json(400, result)
 
     def _handle_disconnect_camera(self, path):
         index = int(path.split("/")[3])
         result = self.camera_manager.disconnect_camera(index)
-        status = 200 if "camera" in result else 400
-        self._send_json(status, result)
+        if "camera" in result:
+            self._send_json(200, result)
+        elif "not found" in result.get("error", ""):
+            self._send_json(404, result)
+        else:
+            self._send_json(400, result)
 
     def _handle_delete_camera(self, path):
         index = int(path.split("/")[3])
         result = self.camera_manager.remove_camera(index)
-        status = 200 if "cameras" in result else 404
-        self._send_json(status, result)
+        if "cameras" in result:
+            self._send_json(200, result)
+        else:
+            self._send_json(404, result)
 
     def _handle_upload_video(self):
         qs = parse_qs(urlparse(self.path).query)

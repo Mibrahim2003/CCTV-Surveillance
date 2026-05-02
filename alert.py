@@ -12,7 +12,7 @@ Usage:
     from alert import AlertServer
     server = AlertServer()
     await server.start()
-    await server.send_alert("Camera 1", 0.82, "ALERT")
+    await server.send_alert("Camera 1", camera_index=0, score=0.82, status="ALERT")
 """
 
 import asyncio
@@ -140,8 +140,9 @@ async def _demo():
             else:
                 status = "NORMAL"
 
+            camera_index = cameras.index(cam)
             print(f"[Alert] {cam} | Score: {score:.2f} | Status: {status}")
-            await server.send_alert(cam, score, status)
+            await server.send_alert(cam, camera_index, score, status)
 
     except KeyboardInterrupt:
         print("\n[Alert] Shutting down...")
