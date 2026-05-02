@@ -62,17 +62,19 @@ class AlertServer:
             self.clients.discard(websocket)
             print(f"[Alert] Dashboard disconnected: {remote[0]}:{remote[1]} ({len(self.clients)} total)")
 
-    async def send_alert(self, camera_id: str, score: float, status: str):
+    async def send_alert(self, camera_id: str, camera_index: int, score: float, status: str):
         """
         Broadcast an alert to all connected dashboard clients.
 
         Args:
-            camera_id: Camera name, e.g. "Camera 1"
-            score:     Fight probability score (0.0 to 1.0)
-            status:    "ALERT", "WARNING", or "NORMAL"
+            camera_id:    Camera name, e.g. "Camera 1"
+            camera_index: Camera index for tile matching
+            score:        Fight probability score (0.0 to 1.0)
+            status:       "ALERT", "WARNING", or "NORMAL"
         """
         message = json.dumps({
             "camera": camera_id,
+            "camera_index": camera_index,
             "score": round(score, 4),
             "status": status,
             "timestamp": datetime.now().isoformat(),

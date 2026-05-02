@@ -29,6 +29,10 @@ desktop.ini
 *.mkv
 *.mov
 
+# Runtime state — not source code
+uploads/
+cameras.json
+
 # Model files (large — track with Git LFS or download separately)
 # Uncomment the next two lines if NOT using Git LFS:
 # models/*.pt

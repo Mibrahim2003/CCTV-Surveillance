@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -325,6 +325,122 @@
             background: rgba(34, 197, 94, 0.1);
             color: var(--color-normal);
         }
+        .status-badge.OFFLINE {
+            background: rgba(100,116,139,0.15);
+            color: var(--text-muted);
+        }
+        .status-badge.CONNECTING {
+            background: rgba(59,130,246,0.15);
+            color: var(--accent-blue);
+        }
+        .status-badge.ERROR {
+            background: rgba(249,115,22,0.15);
+            color: #f97316;
+        }
+        .camera-tile.status-OFFLINE { border-color: var(--border-default); opacity: 0.55; }
+        .camera-tile.status-CONNECTING { border-color: var(--accent-blue); animation: glow-blue 1s ease-in-out infinite alternate; }
+        .camera-tile.status-ERROR { border-color: #f97316; }
+        @keyframes glow-blue {
+            0% { box-shadow: 0 0 12px rgba(59,130,246,0.3); }
+            100% { box-shadow: 0 0 22px rgba(59,130,246,0.5); }
+        }
+        .score-value.OFFLINE, .score-value.CONNECTING, .score-value.ERROR { color: var(--text-muted); }
+        .live-badge.offline-badge { background: rgba(100,116,139,0.15); color: var(--text-muted); }
+        .live-badge.connecting-badge { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .live-badge.error-badge { background: rgba(249,115,22,0.15); color: #f97316; }
+
+        /* + Add Camera tile */
+        .camera-tile.add-tile {
+            border: 2px dashed var(--border-normal);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 240px; cursor: pointer;
+            opacity: 0.6; transition: opacity 0.2s, border-color 0.2s;
+        }
+        .camera-tile.add-tile:hover { opacity: 1; border-color: var(--accent-blue); }
+        .add-tile-icon { font-size: 36px; margin-bottom: 10px; color: var(--text-muted); }
+        .add-tile-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+        /* Tile clickable cursor */
+        .camera-tile:not(.add-tile) { cursor: pointer; }
+
+        /* ============================================
+           MANAGE MODAL
+           ============================================ */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); z-index: 100;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #161f2e; border: 1px solid var(--border-normal);
+            border-radius: 16px; padding: 28px; width: 420px; max-width: 95vw;
+            animation: modal-in 0.2s ease-out;
+        }
+        @keyframes modal-in {
+            from { opacity:0; transform: scale(0.95) translateY(-10px); }
+            to   { opacity:1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .modal-title { font-size: 16px; font-weight: 700; }
+        .modal-close {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 6px;
+        }
+        .modal-close:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .modal-section { margin-bottom: 14px; }
+        .modal-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .modal-input {
+            width: 100%; background: #0d1117; border: 1px solid var(--border-normal);
+            border-radius: 8px; padding: 10px 14px; color: var(--text-primary);
+            font-size: 14px; outline: none;
+        }
+        .modal-input:focus { border-color: var(--accent-blue); }
+        .modal-btn-row { display: flex; gap: 10px; margin-top: 8px; }
+        .btn {
+            flex: 1; padding: 10px 16px; border-radius: 8px; border: none;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s;
+        }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background: var(--accent-blue); color: #fff; }
+        .btn-ghost { background: var(--bg-card-hover); color: var(--text-secondary); }
+        .btn-danger { background: rgba(239,68,68,0.15); color: var(--color-alert); }
+        .btn-warning { background: rgba(234,179,8,0.12); color: var(--color-warning); }
+        .source-type-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+        .tab-btn {
+            flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border-normal);
+            background: none; color: var(--text-secondary); font-size: 12px;
+            font-weight: 600; cursor: pointer; transition: all 0.15s;
+        }
+        .tab-btn.active { background: var(--accent-blue-dim); border-color: var(--accent-blue); color: var(--accent-blue); }
+        .source-panel { display: none; }
+        .source-panel.active { display: block; }
+        .modal-divider { border: none; border-top: 1px solid var(--border-default); margin: 16px 0; }
+        .modal-error { color: #f97316; font-size: 12px; margin-top: 6px; display: none; }
+        .modal-error.visible { display: block; }
+        .spinner {
+            display: inline-block; width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+            border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 28px; right: 28px;
+            background: #1e293b; border: 1px solid var(--border-normal);
+            border-radius: 10px; padding: 12px 18px;
+            font-size: 13px; color: var(--text-primary);
+            z-index: 200; opacity: 0; transform: translateY(10px);
+            transition: all 0.3s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { border-color: #f97316; color: #f97316; }
+        .toast.success { border-color: var(--color-normal); color: var(--color-normal); }
 
         /* ============================================
            ALERT LOG
@@ -458,101 +574,186 @@
         </div>
     </div>
 
+    <!-- Manage Camera Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="manageModal">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">Manage Camera</span>
+                <button class="modal-close" onclick="closeModal()">âœ•</button>
+            </div>
+
+            <!-- Connect section -->
+            <div id="connectSection">
+                <div class="modal-label">Connect Source</div>
+                <div class="source-type-tabs">
+                    <button class="tab-btn active" id="tabCctv" onclick="switchTab('cctv')">ðŸ“¡ CCTV</button>
+                    <button class="tab-btn" id="tabVideo" onclick="switchTab('video')">ðŸŽ¬ Video</button>
+                </div>
+
+                <!-- CCTV panel -->
+                <div class="source-panel active" id="panelCctv">
+                    <div class="modal-label">Stream URL (RTSP / HTTP)</div>
+                    <input class="modal-input" id="cctvUrl" type="text" placeholder="rtsp://192.168.1.10/live">
+                    <div class="modal-error" id="cctvError"></div>
+                    <div class="modal-btn-row">
+                        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" id="btnConnectCctv" onclick="connectCctv()">Connect</button>
+                    </div>
+                </div>
+
+                <!-- Video panel -->
+                <div class="source-panel" id="panelVideo">
+                    <div class="modal-label">Local File Path</div>
+                    <input class="modal-input" id="videoPath" type="text" placeholder="C:\Videos\clip.avi or relative path">
+                    <div class="modal-label" style="margin-top:12px">â€” or upload â€”</div>
+                    <input type="file" id="videoFile" accept=".avi,.mp4,.mkv,.mov,.webm" style="display:none" onchange="handleFileSelected()">
+                    <div class="modal-btn-row">
+                        <button class="btn btn-ghost" onclick="document.getElementById('videoFile').click()">Browse...</button>
+                        <button class="btn btn-primary" id="btnConnectVideo" onclick="connectVideo()">Connect</button>
+                    </div>
+                    <div class="modal-error" id="videoError"></div>
+                </div>
+            </div>
+
+            <hr class="modal-divider" id="modalDivider">
+
+            <!-- Actions -->
+            <div id="actionSection">
+                <div class="modal-btn-row" id="disconnectRow" style="display:none">
+                    <button class="btn btn-warning" onclick="disconnectCamera()">â¹ Disconnect</button>
+                </div>
+                <div class="modal-btn-row" style="margin-top:8px">
+                    <button class="btn btn-danger" onclick="removeCamera()">ðŸ—‘ Remove Camera</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+
     <script>
         // =============================================
         // CONFIGURATION
         // =============================================
-        let WS_URL = `ws://${window.location.hostname}:8765`;  // Default, overridden by API
-        let CAMERAS = [];  // Populated from /api/cameras
+        let WS_URL = `ws://${window.location.hostname}:8765`;
         const MAX_LOG_ENTRIES = 50;
 
         // =============================================
         // STATE
         // =============================================
-        const cameraStates = {};
+        // cameraStates keyed by index (number)
+        const cameraStates = {};   // { index: {id, active, status, score} }
         let ws = null;
         let reconnectTimer = null;
-        let activeCameraCount = 0;
+        let activeModal = null;    // index of camera in modal
 
         // =============================================
         // INIT TILES
         // =============================================
-        function initTiles(cameraConfig) {
+        function initTiles(cameraList) {
             const grid = document.getElementById("cameraGrid");
             grid.innerHTML = "";
-            activeCameraCount = 0;
 
-            cameraConfig.forEach(cam => {
-                const name = cam.id;
-                const index = cam.index;
-                const active = cam.active;
-                CAMERAS.push(name);
-                cameraStates[name] = { score: 0, status: active ? "NORMAL" : "OFFLINE" };
-                if (active) activeCameraCount++;
-
-                const tile = document.createElement("div");
-                tile.className = active ? "camera-tile status-NORMAL" : "camera-tile status-OFFLINE";
-                tile.id = "tile-" + name.replace(/\s/g, "-");
-                tile.innerHTML = `
-                    <div class="tile-header">
-                        <span class="camera-name">${name}</span>
-                        <span class="live-badge">${active ? 'Live' : 'Offline'}</span>
-                    </div>
-                    <div class="tile-video">
-                        ${active
-                            ? `<img class="video-feed" src="/feed/${index}" alt="${name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-                               <span class="video-placeholder" style="display:none">${name} — No Signal</span>`
-                            : `<span class="video-placeholder">${name} — Offline</span>`
-                        }
-                    </div>
-                    <div class="tile-footer">
-                        <div class="score-display">
-                            <span class="score-label">Score&nbsp;</span>
-                            <span class="score-value ${active ? 'NORMAL' : 'OFFLINE'}" id="score-${name.replace(/\s/g, "-")}">${active ? '0.00' : '—'}</span>
-                        </div>
-                        <span class="status-badge ${active ? 'NORMAL' : 'OFFLINE'}" id="badge-${name.replace(/\s/g, "-")}">${active ? 'NORMAL' : 'OFFLINE'}</span>
-                    </div>
-                `;
-                if (!active) tile.style.opacity = '0.5';
-                grid.appendChild(tile);
+            cameraList.forEach(cam => {
+                renderTile(cam);
+                cameraStates[cam.index] = {
+                    id: cam.id,
+                    active: cam.active,
+                    status: cam.active ? "NORMAL" : "OFFLINE",
+                    score: 0,
+                };
             });
 
-            document.getElementById("camerasOnline").textContent = activeCameraCount;
+            appendAddTile();
+            updateOnlineCount();
+        }
+
+        function renderTile(cam) {
+            const grid = document.getElementById("cameraGrid");
+            // Remove existing tile if re-rendering
+            const existing = document.getElementById("tile-" + cam.index);
+            if (existing) existing.remove();
+
+            const status = cam.active ? "NORMAL" : "OFFLINE";
+            const tile = document.createElement("div");
+            tile.className = `camera-tile status-${status}`;
+            tile.id = "tile-" + cam.index;
+            tile.setAttribute("data-index", cam.index);
+            tile.onclick = () => openModal(cam.index);
+
+            const badgeClass = cam.active ? "Live" : "Offline";
+            const badgeCls   = cam.active ? "" : " offline-badge";
+            tile.innerHTML = `
+                <div class="tile-header">
+                    <span class="camera-name" id="name-${cam.index}">${cam.id}</span>
+                    <span class="live-badge${badgeCls}" id="livebadge-${cam.index}">${badgeClass}</span>
+                </div>
+                <div class="tile-video" id="video-${cam.index}">
+                    ${cam.active
+                        ? `<img class="video-feed" id="feed-${cam.index}" src="/feed/${cam.index}" alt="${cam.id}"
+                               onerror="this.style.display='none';document.getElementById('placeholder-${cam.index}').style.display='flex'" />
+                           <span class="video-placeholder" id="placeholder-${cam.index}" style="display:none">${cam.id} â€” No Signal</span>`
+                        : `<span class="video-placeholder" id="placeholder-${cam.index}">${cam.id} â€” Offline</span>`
+                    }
+                </div>
+                <div class="tile-footer">
+                    <div class="score-display">
+                        <span class="score-label">Score&nbsp;</span>
+                        <span class="score-value ${status}" id="score-${cam.index}">${cam.active ? '0.00' : 'â€”'}</span>
+                    </div>
+                    <span class="status-badge ${status}" id="badge-${cam.index}">${status}</span>
+                </div>
+            `;
+            // Insert before add tile if it exists
+            const addTile = document.getElementById("add-tile");
+            if (addTile) grid.insertBefore(tile, addTile);
+            else grid.appendChild(tile);
+        }
+
+        function appendAddTile() {
+            const grid = document.getElementById("cameraGrid");
+            let addTile = document.getElementById("add-tile");
+            if (addTile) return;
+            addTile = document.createElement("div");
+            addTile.className = "camera-tile add-tile";
+            addTile.id = "add-tile";
+            addTile.onclick = createCamera;
+            addTile.innerHTML = `<div class="add-tile-icon">ï¼‹</div><div class="add-tile-label">Add Camera</div>`;
+            grid.appendChild(addTile);
         }
 
         // =============================================
-        // UPDATE TILE
+        // UPDATE TILE STATE
         // =============================================
-        function updateTile(camera, score, status) {
-            const id = camera.replace(/\s/g, "-");
-            const tile = document.getElementById("tile-" + id);
-            const scoreEl = document.getElementById("score-" + id);
-            const badgeEl = document.getElementById("badge-" + id);
-
+        function setTileStatus(index, status, score) {
+            const tile    = document.getElementById("tile-" + index);
+            const scoreEl = document.getElementById("score-" + index);
+            const badgeEl = document.getElementById("badge-" + index);
             if (!tile) return;
 
-            // Update tile border/glow
             tile.className = "camera-tile status-" + status;
+            if (scoreEl) { scoreEl.textContent = (score !== null) ? score.toFixed(2) : "â€”"; scoreEl.className = "score-value " + status; }
+            if (badgeEl) { badgeEl.textContent = status; badgeEl.className = "status-badge " + status; }
 
-            // Update score
-            scoreEl.textContent = score.toFixed(2);
-            scoreEl.className = "score-value " + status;
-
-            // Update badge
-            badgeEl.textContent = status;
-            badgeEl.className = "status-badge " + status;
-
-            // Update state
-            cameraStates[camera] = { score, status };
+            if (cameraStates[index]) cameraStates[index].status = status;
+            updateOnlineCount();
             updateStats();
         }
 
-        // =============================================
-        // UPDATE STATS BAR
-        // =============================================
+        function setTileLiveBadge(index, label, extraClass) {
+            const el = document.getElementById("livebadge-" + index);
+            if (el) { el.textContent = label; el.className = "live-badge" + (extraClass ? " " + extraClass : ""); }
+        }
+
+        function updateOnlineCount() {
+            const count = Object.values(cameraStates).filter(s => s.active).length;
+            document.getElementById("camerasOnline").textContent = count;
+        }
+
         function updateStats() {
-            let alerts = 0;
-            let warnings = 0;
+            let alerts = 0, warnings = 0;
             Object.values(cameraStates).forEach(s => {
                 if (s.status === "ALERT") alerts++;
                 if (s.status === "WARNING") warnings++;
@@ -562,20 +763,45 @@
         }
 
         // =============================================
-        // ALERT LOG
+        // WEBSOCKET â€” uses camera_index for tile matching
         // =============================================
-        function addLogEntry(camera, score, status) {
-            // Only log warnings and alerts
-            if (status === "NORMAL") return;
+        function connect() {
+            if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+            ws = new WebSocket(WS_URL);
 
+            ws.onopen = () => {
+                const el = document.getElementById("connectionStatus");
+                el.classList.add("connected");
+                document.getElementById("connectionText").textContent = "Connected";
+            };
+            ws.onclose = () => {
+                document.getElementById("connectionStatus").classList.remove("connected");
+                document.getElementById("connectionText").textContent = "Disconnected";
+                reconnectTimer = setTimeout(connect, 3000);
+            };
+            ws.onerror = () => ws.close();
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    const { camera, camera_index, score, status } = data;
+                    if (camera_index !== undefined && score !== undefined && status) {
+                        setTileStatus(camera_index, status, score);
+                        addLogEntry(camera, camera_index, score, status);
+                    }
+                } catch(e) { console.error("[SafeWatch] WS parse error:", e); }
+            };
+        }
+
+        // =============================================
+        // LOG
+        // =============================================
+        function addLogEntry(camera, index, score, status) {
+            if (status === "NORMAL") return;
             const log = document.getElementById("alertLog");
-            // Remove empty placeholder
             const empty = log.querySelector(".log-empty");
             if (empty) empty.remove();
 
-            const now = new Date();
-            const time = now.toTimeString().split(" ")[0];
-
+            const time = new Date().toTimeString().split(" ")[0];
             const entry = document.createElement("div");
             entry.className = "log-entry";
             entry.innerHTML = `
@@ -584,59 +810,210 @@
                 <span class="log-status ${status}">${status}</span>
                 <span class="log-score">Score: ${score.toFixed(2)}</span>
             `;
-
-            // Insert at top
             log.insertBefore(entry, log.firstChild);
+            while (log.children.length > MAX_LOG_ENTRIES) log.removeChild(log.lastChild);
+        }
 
-            // Cap log entries
-            while (log.children.length > MAX_LOG_ENTRIES) {
-                log.removeChild(log.lastChild);
+        // =============================================
+        // MODAL
+        // =============================================
+        function openModal(index) {
+            activeModal = index;
+            const state = cameraStates[index];
+            document.getElementById("modalTitle").textContent = state ? state.id : "Manage Camera";
+            document.getElementById("cctvUrl").value = "";
+            document.getElementById("videoPath").value = "";
+            document.getElementById("cctvError").textContent = "";
+            document.getElementById("cctvError").classList.remove("visible");
+            document.getElementById("videoError").textContent = "";
+            document.getElementById("videoError").classList.remove("visible");
+            switchTab("cctv");
+
+            // Show/hide disconnect button
+            const isActive = state && state.active;
+            document.getElementById("disconnectRow").style.display = isActive ? "flex" : "none";
+            // Hide connect tabs if active
+            document.getElementById("connectSection").style.display = isActive ? "none" : "block";
+            document.getElementById("modalDivider").style.display = "block";
+
+            document.getElementById("modalOverlay").classList.add("open");
+        }
+
+        function closeModal() {
+            document.getElementById("modalOverlay").classList.remove("open");
+            activeModal = null;
+        }
+
+        // Close on overlay click
+        document.getElementById("modalOverlay").addEventListener("click", e => {
+            if (e.target === document.getElementById("modalOverlay")) closeModal();
+        });
+
+        function switchTab(tab) {
+            document.getElementById("tabCctv").classList.toggle("active", tab === "cctv");
+            document.getElementById("tabVideo").classList.toggle("active", tab === "video");
+            document.getElementById("panelCctv").classList.toggle("active", tab === "cctv");
+            document.getElementById("panelVideo").classList.toggle("active", tab === "video");
+        }
+
+        // =============================================
+        // CAMERA ACTIONS
+        // =============================================
+        async function createCamera() {
+            // Count cameras for auto-name
+            const n = Object.keys(cameraStates).length + 1;
+            const name = `Camera ${n}`;
+            const resp = await fetch("/api/cameras", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({id: name}),
+            });
+            const data = await resp.json();
+            if (data.camera) {
+                cameraStates[data.camera.index] = {id: data.camera.id, active: false, status: "OFFLINE", score: 0};
+                renderTile(data.camera);
+                appendAddTile();
+                updateOnlineCount();
+                showToast(`${data.camera.id} added`, "success");
+            } else {
+                showToast(data.error || "Failed to add camera", "error");
+            }
+        }
+
+        async function connectCctv() {
+            const url = document.getElementById("cctvUrl").value.trim();
+            if (!url) { showError("cctvError", "Enter a stream URL"); return; }
+            setBtnLoading("btnConnectCctv", true);
+            const result = await doConnect(activeModal, "cctv", url);
+            setBtnLoading("btnConnectCctv", false);
+            if (result) closeModal();
+        }
+
+        async function connectVideo() {
+            const path = document.getElementById("videoPath").value.trim();
+            if (!path) { showError("videoError", "Enter a file path"); return; }
+            setBtnLoading("btnConnectVideo", true);
+            const result = await doConnect(activeModal, "video_path", path);
+            setBtnLoading("btnConnectVideo", false);
+            if (result) closeModal();
+        }
+
+        async function handleFileSelected() {
+            const file = document.getElementById("videoFile").files[0];
+            if (!file) return;
+            setBtnLoading("btnConnectVideo", true);
+            showError("videoError", "");
+
+            // Upload file
+            const uploadResp = await fetch(`/api/videos?filename=${encodeURIComponent(file.name)}`, {
+                method: "POST",
+                headers: {"Content-Type": "application/octet-stream"},
+                body: file,
+            });
+            const uploadData = await uploadResp.json();
+            if (!uploadResp.ok || !uploadData.filename) {
+                setBtnLoading("btnConnectVideo", false);
+                showError("videoError", uploadData.error || "Upload failed");
+                return;
+            }
+            // Auto-connect after upload
+            const result = await doConnect(activeModal, "video_upload", uploadData.filename);
+            setBtnLoading("btnConnectVideo", false);
+            if (result) closeModal();
+        }
+
+        async function doConnect(index, source_type, source) {
+            setTileStatus(index, "CONNECTING", null);
+            setTileLiveBadge(index, "Connecting", "connecting-badge");
+
+            const resp = await fetch(`/api/cameras/${index}/connect`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({source_type, source}),
+            });
+            const data = await resp.json();
+
+            if (data.camera) {
+                // Rebuild tile with live feed
+                cameraStates[index] = {id: data.camera.id, active: true, status: "NORMAL", score: 0};
+                renderTile(data.camera);
+                appendAddTile();
+                updateOnlineCount();
+                showToast(`${data.camera.id} connected`, "success");
+                return true;
+            } else {
+                setTileStatus(index, "ERROR", null);
+                setTileLiveBadge(index, "Error", "error-badge");
+                const errId = source_type === "cctv" ? "cctvError" : "videoError";
+                showError(errId, data.error || "Connection failed");
+                showToast(data.error || "Connection failed", "error");
+                return false;
+            }
+        }
+
+        async function disconnectCamera() {
+            if (activeModal === null) return;
+            const index = activeModal;
+            closeModal();
+            const resp = await fetch(`/api/cameras/${index}/disconnect`, {method: "POST"});
+            const data = await resp.json();
+            if (data.camera) {
+                cameraStates[index] = {id: data.camera.id, active: false, status: "OFFLINE", score: 0};
+                renderTile(data.camera);
+                appendAddTile();
+                updateOnlineCount();
+                showToast(`${data.camera.id} disconnected`, "success");
+            } else {
+                showToast(data.error || "Disconnect failed", "error");
+            }
+        }
+
+        async function removeCamera() {
+            if (activeModal === null) return;
+            const index = activeModal;
+            const name = cameraStates[index] ? cameraStates[index].id : `Camera ${index}`;
+            if (!confirm(`Remove ${name}?`)) return;
+            closeModal();
+
+            const resp = await fetch(`/api/cameras/${index}`, {method: "DELETE"});
+            const data = await resp.json();
+            if (data.cameras !== undefined) {
+                delete cameraStates[index];
+                const tile = document.getElementById("tile-" + index);
+                if (tile) tile.remove();
+                updateOnlineCount();
+                updateStats();
+                showToast(`${name} removed`, "success");
+            } else {
+                showToast(data.error || "Remove failed", "error");
             }
         }
 
         // =============================================
-        // WEBSOCKET
+        // HELPERS
         // =============================================
-        function connect() {
-            if (reconnectTimer) {
-                clearTimeout(reconnectTimer);
-                reconnectTimer = null;
-            }
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.toggle("visible", !!msg);
+        }
 
-            ws = new WebSocket(WS_URL);
+        function setBtnLoading(id, loading) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.disabled = loading;
+            btn.innerHTML = loading ? `<span class="spinner"></span>Connecting...` : btn.textContent.replace(/.*Connecting\.\.\./, "Connect");
+            if (!loading) btn.innerHTML = "Connect";
+        }
 
-            ws.onopen = () => {
-                const el = document.getElementById("connectionStatus");
-                el.classList.add("connected");
-                document.getElementById("connectionText").textContent = "Connected";
-                console.log("[SafeWatch] WebSocket connected");
-            };
-
-            ws.onclose = () => {
-                const el = document.getElementById("connectionStatus");
-                el.classList.remove("connected");
-                document.getElementById("connectionText").textContent = "Disconnected";
-                console.log("[SafeWatch] WebSocket disconnected. Reconnecting in 3s...");
-                reconnectTimer = setTimeout(connect, 3000);
-            };
-
-            ws.onerror = (err) => {
-                console.error("[SafeWatch] WebSocket error:", err);
-                ws.close();
-            };
-
-            ws.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    const { camera, score, status } = data;
-                    if (camera && score !== undefined && status) {
-                        updateTile(camera, score, status);
-                        addLogEntry(camera, score, status);
-                    }
-                } catch (e) {
-                    console.error("[SafeWatch] Failed to parse message:", e);
-                }
-            };
+        let toastTimer = null;
+        function showToast(msg, type) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.className = `toast ${type || ""} show`;
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove("show"), 3500);
         }
 
         // =============================================
@@ -645,19 +1022,16 @@
         fetch('/api/cameras')
             .then(r => r.json())
             .then(payload => {
-                if (payload.ws_port) {
-                    WS_URL = `ws://${window.location.hostname}:${payload.ws_port}`;
-                }
+                if (payload.ws_port) WS_URL = `ws://${window.location.hostname}:${payload.ws_port}`;
                 initTiles(payload.cameras || payload);
                 connect();
             })
             .catch(() => {
-                // Fallback if API unavailable
                 initTiles([
-                    {id: 'Camera 1', index: 0, active: true},
-                    {id: 'Camera 2', index: 1, active: false},
-                    {id: 'Camera 3', index: 2, active: false},
-                    {id: 'Camera 4', index: 3, active: false},
+                    {index: 0, id: 'Camera 1', active: true},
+                    {index: 1, id: 'Camera 2', active: false},
+                    {index: 2, id: 'Camera 3', active: false},
+                    {index: 3, id: 'Camera 4', active: false},
                 ]);
                 connect();
             });
