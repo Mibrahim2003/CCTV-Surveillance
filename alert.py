@@ -80,6 +80,10 @@ class AlertServer:
             "timestamp": datetime.now().isoformat(),
         })
 
+        # Persist to disk for auditable monitoring
+        with open("alerts.log", "a") as f:
+            f.write(f"{datetime.now().isoformat()} | {camera_id} | {status} | {score}\n")
+
         if not self.clients:
             return
 
