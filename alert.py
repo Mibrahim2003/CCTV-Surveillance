@@ -17,6 +17,7 @@ Usage:
 
 import asyncio
 import json
+import os
 import sys
 from datetime import datetime
 
@@ -31,7 +32,10 @@ except ImportError:
     print("    pip install websockets")
     raise
 
-from config import ALERT_THRESHOLD, WARNING_THRESHOLD, WS_PORT
+from config import ALERT_THRESHOLD, WARNING_THRESHOLD, WS_PORT, BASE_DIR
+
+# Absolute path so the log lands beside the code, not in the launch CWD.
+ALERTS_LOG_PATH = os.path.join(BASE_DIR, "alerts.log")
 
 
 class AlertServer:
@@ -45,6 +49,7 @@ class AlertServer:
         self.port = port
         self.clients = set()
         self.server = None
+        self._log_file = None   # Opened once in start(), line-buffered append
 
     async def _handler(self, websocket):
         """Handle a new dashboard client connection."""
@@ -80,9 +85,15 @@ class AlertServer:
             "timestamp": datetime.now().isoformat(),
         })
 
-        # Persist to disk for auditable monitoring
-        with open("alerts.log", "a") as f:
-            f.write(f"{datetime.now().isoformat()} | {camera_id} | {status} | {score}\n")
+        # Persist to disk for auditable monitoring.
+        # Skip NORMAL — it fires ~1/sec/camera and would grow the log unbounded.
+        if status != "NORMAL" and self._log_file is not None:
+            try:
+                self._log_file.write(
+                    f"{datetime.now().isoformat()} | {camera_id} | {status} | {score}\n"
+                )
+            except OSError as e:
+                print(f"[Alert] Failed to write alerts.log: {e}")
 
         if not self.clients:
             return
@@ -100,6 +111,13 @@ class AlertServer:
 
     async def start(self):
         """Start the WebSocket server."""
+        # Open the audit log once, line-buffered, instead of per-alert.
+        try:
+            self._log_file = open(ALERTS_LOG_PATH, "a", buffering=1)
+        except OSError as e:
+            print(f"[Alert] Could not open {ALERTS_LOG_PATH}: {e}")
+            self._log_file = None
+
         self.server = await serve(
             self._handler, self.host, self.port,
             reuse_address=True,
@@ -113,6 +131,9 @@ class AlertServer:
             self.server.close()
             await self.server.wait_closed()
             print("[Alert] Server stopped.")
+        if self._log_file is not None:
+            self._log_file.close()
+            self._log_file = None
 
 
 # ---------------------------------------------------------------
